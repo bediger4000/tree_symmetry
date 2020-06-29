@@ -1,0 +1,40 @@
+#!/bin/bash
+set -eou pipefail
+
+if [[ ! -x ./sym ]]
+then
+	echo "Need to compile sym.go"
+	exit 1
+fi
+
+while read SYMMETRIC TREESTRING
+do
+	if ./sym -q "$TREESTRING"
+	then
+		if [[ $SYMMETRIC == no ]]
+		then
+			echo problem nonsymmetric $TREESTRING
+		fi
+	else
+		if [[ $SYMMETRIC == yes ]]
+		then
+			echo problem symmetric $TREESTRING
+		fi
+	fi
+done << END
+yes (1)
+yes (1 (0))
+no (1 (0) (91))
+yes (4 (3 (9)) (5) (3 (9)))
+no (4 (3 (9)) (5) (3 (0)))
+yes (4 (3) (5) (3))
+yes (4 (3) (5 (6)) (3))
+yes (4 (3 (9)) (5 (7) (7)) (3 (9)))
+no (4 (3 (9)) (5 (8) (7)) (3 (9)))
+yes (0 (1 (2 (3))))
+yes (0 (1 (2 (3 (4) (4)))))
+no (0 (1 (2 (3 (4) (5)))))
+yes (0 (1) (1) (1) (1))
+yes (0 (1) (1) (123) (1) (1))
+no (0 (1) (1) (123 (2) (3)) (1) (1))
+END

@@ -13,7 +13,7 @@ func main() {
 		graphViz = true
 		n = 2
 	}
-	root, _ := multitree.FromString(os.Args[n])
+	root := multitree.FromString(os.Args[n])
 
 	if graphViz {
 		multitree.Draw(root)

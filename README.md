@@ -129,6 +129,11 @@ When careless mirror child node selection can lead to examining the tree twice,
 and the idea that both comparison nodes can refer to the same node exist,
 the interviewer might get to see if the candidate can demonstrate a little insight.
 
-A non-recursive solution might be given extra points.
+A [non-recursive solution](sym_iterative.go) might be given extra points.
+It's basically the same as a depth-first traverse of a binary tree,
+except that the code has to keep track of two nodes in the tree to compare.
+An iterative solution would require more "infrastructure" code,
+a stack or queue to keep track of pairs of nodes-to-compare,
+but none of this is very special code.
 
 Overall, a decent problem for an interview, I think.

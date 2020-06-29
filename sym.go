@@ -9,7 +9,21 @@ import (
 )
 
 func main() {
-	root := multitree.FromString(os.Args[1])
+	viaExitStatus := false
+	n := 1
+	if os.Args[1] == "-q" {
+		n = 2
+		viaExitStatus = true
+	}
+	root := multitree.FromString(os.Args[n])
+
+	if viaExitStatus {
+		if symmetric(root, root) {
+			return
+		}
+		os.Exit(1)
+	}
+
 	multitree.Print(root)
 	fmt.Println()
 
@@ -46,8 +60,11 @@ func symmetric(node1, node2 *multitree.Node) bool {
 	}
 
 	for idx := range node1.Children {
-		mir := ln1 - idx - 1
-		if !symmetric(node1.Children[idx], node2.Children[mir]) {
+		idxMirror := ln1 - idx - 1
+		if idxMirror < idx {
+			break
+		}
+		if !symmetric(node1.Children[idx], node2.Children[idxMirror]) {
 			return false
 		}
 	}

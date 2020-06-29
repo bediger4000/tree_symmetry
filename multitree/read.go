@@ -2,12 +2,13 @@ package multitree
 
 import (
 	"log"
+	"math"
 	"strconv"
 	"unicode"
 )
 
 // FromString parses its input string, turning it into a multitree
-func FromString(str string) (*Node, int) {
+func FromString(str string) *Node {
 	runes := []rune(str)
 	root, _ := FromRunes(runes, 0, len(str))
 	return root
@@ -76,6 +77,10 @@ func readDigits(runes []rune, offset int, end int) (int, int) {
 		}
 		valueRunes = append(valueRunes, runes[offset])
 		offset++
+	}
+
+	if len(valueRunes) == 0 {
+		return math.MinInt64, offset
 	}
 
 	number, err := strconv.Atoi(string(valueRunes))

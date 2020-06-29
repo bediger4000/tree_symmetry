@@ -34,3 +34,38 @@ type Node struct {
 ```
 
 ## Algorithm
+
+The symmetry check consists of a single recursive function:
+
+```go
+func symmetric(node1, node2 *multitree.Node) bool {
+	if node1 == nil {
+		if node2 == nil {
+			return true
+		} else {
+			return false
+		}
+	}
+	if node2 == nil {
+		return false
+	}
+
+	if node1.Data != node2.Data {
+		return false
+	}
+
+	ln1 := len(node1.Children)
+	ln2 := len(node2.Children)
+	if ln1 != ln2 {
+		return false
+	}
+
+	for idx := range node1.Children {
+		idxMirror := ln1 - idx - 1
+		if !symmetric(node1.Children[idx], node2.Children[idxMirror]) {
+			return false
+		}
+	}
+	return true
+}
+```

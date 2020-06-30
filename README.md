@@ -137,3 +137,27 @@ a stack or queue to keep track of pairs of nodes-to-compare,
 but none of this is very special code.
 
 Overall, a decent problem for an interview, I think.
+
+## Knuth Transform
+
+From Wikipedia's [Left-child right-sibling binary tree](https://en.wikipedia.org/wiki/Left-child_right-sibling_binary_tree):
+
+```
+The process of converting from a k-ary tree to an LC-RS binary tree is
+sometimes called the Knuth transform. To form a binary tree from an
+arbitrary k-ary tree by this method, the root of the original tree is made the
+root of the binary tree. Then, starting with the root, each node's leftmost
+child in the original tree is made its left child in the binary tree, and its
+nearest sibling to the right in the original tree is made its right child in
+the binary tree.
+```
+
+I wrote [code to do that transform](transform.go), just for fun.
+
+```
+$ ./transform '(1 (2 (5) (6)) (3) (4 (7 (8)(9))))' > x.dot
+$ dot -Tpng -o x.png
+```
+
+That will get you a PNG graphic showing a multitree and the equivalent binary
+tree after a Knuth Transform.

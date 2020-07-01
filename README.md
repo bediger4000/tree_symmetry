@@ -161,3 +161,11 @@ $ dot -Tpng -o x.png
 
 That will get you a PNG graphic showing a multitree and the equivalent binary
 tree after a Knuth Transform.
+
+The reverse is just as easy: the special format binary trees produced by a Knuth Transform
+can be returned to a k-ary tree.
+
+```
+$ ./transform -r '(1 (2 (5) (6)) (3) (4 (7 (8)(9))))' > x.dot
+$ dot -Tpng -o x.png
+```

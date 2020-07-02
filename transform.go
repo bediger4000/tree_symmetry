@@ -42,20 +42,17 @@ func main() {
 // knuthTransform turns a k-ary multitree into a binary tree
 // with a special format.
 func knuthTransform(root *multitree.Node) *tree.NumericNode {
-	broot := &tree.NumericNode{Data: root.Data}
-	l := len(root.Children)
-	if l > 0 {
-		broot.Left = knuthTransform(root.Children[0])
-		var list *tree.NumericNode
+	newNode := &tree.NumericNode{Data: root.Data}
+	if l := len(root.Children); l > 0 {
+		newNode.Left = knuthTransform(root.Children[0])
 		for i := range root.Children[1:] {
-			child := knuthTransform(root.Children[l-1-i])
-			child.Right = list
-			list = child
+			newChild := knuthTransform(root.Children[l-1-i])
+			newChild.Right = newNode.Left.Right
+			newNode.Left.Right = newChild
 		}
-		broot.Left.Right = list
 	}
 
-	return broot
+	return newNode
 }
 
 // knuthUnTransform turns a binary tree into a  k-ary multitree

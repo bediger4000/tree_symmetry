@@ -153,6 +153,7 @@ the binary tree.
 ```
 
 I wrote [code to do that transform](transform.go), just for fun.
+This is the example tree shown in the Wikipedia article:
 
 ```
 $ ./transform '(1 (2 (5) (6)) (3) (4 (7 (8)(9))))' > x.dot

@@ -152,6 +152,8 @@ nearest sibling to the right in the original tree is made its right child in
 the binary tree.
 ```
 
+[Another explanation](https://xlinux.nist.gov/dads/HTML/binaryTreeRepofTree.html).
+
 I wrote [code to do that transform](transform.go), just for fun.
 This is the example tree shown in the Wikipedia article:
 

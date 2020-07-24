@@ -121,7 +121,7 @@ I know I had to build some infrastructure
 to do this problem.
 My binary tree infrastructure was not suitable.
 
-The interviewer would get to see if a candidate could ask good questionsw
+The interviewer would get to see if a candidate could ask good questions
 since ordering of child nodes is potentially a sticky issue.
 The interviewer could see if a candidate can do array indexing and recursive problem solving.
 

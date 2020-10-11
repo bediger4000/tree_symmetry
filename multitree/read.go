@@ -27,7 +27,11 @@ func FromRunes(runes []rune, offset int, end int) (*Node, int) {
 	offset++
 
 	// read number's digits
-	number, newoffset := readDigits(runes, offset, end)
+	makenode, number, newoffset := readDigits(runes, offset, end)
+
+	if !makenode {
+		return nil, newoffset + 1
+	}
 
 	// create Node with number as Data
 	node := &Node{Data: number}
@@ -60,7 +64,7 @@ func FromRunes(runes []rune, offset int, end int) (*Node, int) {
 
 // readDigits returns a number, converted from the leading digits
 // of runes []rune, and an index of where the number ends.
-func readDigits(runes []rune, offset int, end int) (int, int) {
+func readDigits(runes []rune, offset int, end int) (bool, int, int) {
 	var valueRunes []rune
 	for {
 		if runes[offset] == '(' {
@@ -80,14 +84,14 @@ func readDigits(runes []rune, offset int, end int) (int, int) {
 	}
 
 	if len(valueRunes) == 0 {
-		return math.MinInt64, offset
+		return false, math.MinInt64, offset
 	}
 
 	number, err := strconv.Atoi(string(valueRunes))
 	if err != nil {
 		log.Print(err)
 	}
-	return number, offset
+	return true, number, offset
 }
 
 // findRightParen takes an array of runes, where '(' is at

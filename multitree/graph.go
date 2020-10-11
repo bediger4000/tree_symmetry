@@ -26,6 +26,9 @@ func DrawPrefixed(out io.Writer, node *Node, prefix string) {
 	}
 	fmt.Fprintf(out, "%s%p [label=\"%v\"];\n", prefix, node, node.Data)
 	for _, child := range node.Children {
+		if child == nil {
+			continue
+		}
 		DrawPrefixed(out, child, prefix)
 		fmt.Fprintf(out, "%s%p -> %s%p;\n", prefix, node, prefix, child)
 	}

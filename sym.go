@@ -40,31 +40,40 @@ func symmetric(node1, node2 *multitree.Node) bool {
 		if node2 == nil {
 			return true
 		} else {
+			fmt.Printf("node1 nil, node 2 (%p/%d) non-nil\n", node2, node2.Data)
 			return false
 		}
 	}
 	if node2 == nil {
+		fmt.Printf("node 1 (%p/%d) non-nil, node 2 nil\n", node1, node1.Data)
 		return false
 	}
 
 	// node1 and node2 not nil after this
 
 	if node1.Data != node2.Data {
+		fmt.Printf("node1 data %d != node2 data %d\n", node1.Data, node2.Data)
 		return false
 	}
 
-	ln1 := len(node1.Children)
+	childCount := len(node1.Children)
+	children := node1.Children
+	mirrors := node2.Children
 	ln2 := len(node2.Children)
-	if ln1 != ln2 {
-		return false
+	if ln2 > childCount {
+		childCount = ln2
+		children = node2.Children
+		mirrors = node1.Children
 	}
 
 	for idx := range node1.Children {
-		idxMirror := ln1 - idx - 1
+		idxMirror := childCount - idx - 1
+
 		if idxMirror < idx {
 			break
 		}
-		if !symmetric(node1.Children[idx], node2.Children[idxMirror]) {
+
+		if !symmetric(children[idx], mirrors[idxMirror]) {
 			return false
 		}
 	}

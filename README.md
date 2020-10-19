@@ -16,7 +16,6 @@ Given a k-ary tree, determine whether it is symmetric.
 
 I take "k-ary" to mean that each node can have an arbitrary
 number of child nodes.
-An ordering of the child nodes exists.
 
 ## package multitree
 
@@ -35,83 +34,29 @@ type Node struct {
 
 ## Algorithm
 
-The symmetry check consists of a single recursive function:
-
-```go
-func symmetric(node1, node2 *multitree.Node) bool {
-	if node1 == nil {
-		if node2 == nil {
-			return true
-		} else {
-			return false
-		}
-	}
-	if node2 == nil {
-		return false
-	}
-
-	if node1.Data != node2.Data {
-		return false
-	}
-
-	ln1 := len(node1.Children)
-	ln2 := len(node2.Children)
-	if ln1 != ln2 {
-		return false
-	}
-
-	for idx := range node1.Children {
-		idxMirror := ln1 - idx - 1
-		if idxMirror < idx {break}
-		if !symmetric(node1.Children[idx], node2.Children[idxMirror]) {
-			return false
-		}
-	}
-	return true
-}
-```
-
-The function follows a node and its "reflection" through the tree.
-
-The function has base cases for nil-value nodes,
-one or the other "reflected" node not existing,
-different data for node and reflected node,
-different number of children for node and reflected node.
 
 ## Analysis
 
 A web search turns up a lot of "are binary trees symmetric" solutions,
 but very few multi-child tree solutions.
 
-You have to assume some ordering of the child nodes of any given node,
-otherwise the question doesn't make any sense -
-it just becomes an exercize in combinatorics,
-with the usual O(n!) or worse solution.
+If you assume that an ordering of child nodes exists,
+you end up having to deal with cases like this:
+
+```
+tree 1: (4 (3 () (6)) (5) (3 (6) ()))
+tree 2: (4 (3 () (6)) (5) (3 (6)   ))
+```
+
+Is tree 2 symmetric? 
+The 3-valued nodes have different length child-node-arrays,
+but the left-hand 3-valued node has a nil-valued node just
+to keep the order correct.
 
 There are a few tricky parts.
 The first is that instead of a recursive comparison having to
 "go left" for one child, and "go right" for the other child,
-the comparison has to loop over the child nodes of the current node,
-comparing outermost children, next outermost children, etc.
 
-The next tricky piece is to realize you don't have to loop through all of the child nodes,
-just to the "middle" child node.
-The comparison is some kind of left node to the mirror image right node.
-The algorithm has already checked outermost left vs outermost right.
-It doesn't need to check them the other way around.
-
-The final tricky part is the "middle" child of a node with an odd number of children.
-One wrong solution is to ignore middle children -
-they are themselves if you reflect the tree,
-but the middle subtree could be asymmetric.
-Another wrong solution is to check symmetry of middle subtrees by themselves.
-A tree could have different "middle" subtrees of outermost nodes.
-
-One correct solution is to realize that the two nodes the recursive comparison
-function tracks can both examine the same middle node.
-The comparison function does not need a special case for middle children,
-it just needs to compute which child node to follow so that the middle
-child gets examined.
 
 This is probably a decent interview problem.
 Multi-child trees don't occur too often in day-to-day programming,
@@ -172,3 +117,36 @@ can be returned to a k-ary tree.
 $ ./transform -r '(1 (2 (5) (6)) (3) (4 (7 (8)(9))))' > x.dot
 $ dot -Tpng -o x.png
 ```
+
+---
+
+## Daily Coding Problem: Problem #686 [Hard]
+
+This problem was asked by Adobe.
+
+You are given a tree with an even number of nodes.
+Consider each connection between a parent and child node to be an "edge".
+You would like to remove some of these edges,
+such that the disconnected subtrees that remain
+each have an even number of nodes.
+
+For example, suppose your input was the following tree:
+
+```
+   1
+  / \ 
+ 2   3
+    / \ 
+   4   5
+ / | \
+6  7  8
+```
+
+In this case, removing the edge (3, 4) satisfies our requirement.
+
+Write a function that returns the maximum number of edges you can remove
+while still satisfying this requirement.
+
+### Analysis
+
+I haven't worked on this yet.

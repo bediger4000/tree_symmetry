@@ -17,6 +17,8 @@ Given a k-ary tree, determine whether it is symmetric.
 I take "k-ary" to mean that each node can have an arbitrary
 number of child nodes.
 
+This has appeared as "Daily Coding Problem: Problem #1077 [Easy]"
+
 ## package multitree
 
 I wrote a small Golang package to represent trees where nodes
@@ -47,6 +49,8 @@ you end up having to deal with cases like this:
 tree 1: (4 (3 () (6)) (5) (3 (6) ()))
 tree 2: (4 (3 () (6)) (5) (3 (6)   ))
 ```
+
+I think tree1 is not symmetric.
 
 Is tree 2 symmetric? 
 The 3-valued nodes have different length child-node-arrays,

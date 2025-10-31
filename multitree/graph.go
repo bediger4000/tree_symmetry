@@ -21,12 +21,11 @@ func Drawf(out io.Writer, root *Node) {
 // DrawPrefixed outputs dot language directives for the current
 // node, and the edges directed to its children.
 func DrawPrefixed(out io.Writer, node *Node, prefix string) {
-	if node == nil {
-		return
-	}
 	fmt.Fprintf(out, "%s%p [label=\"%v\"];\n", prefix, node, node.Data)
-	for _, child := range node.Children {
+	for i, child := range node.Children {
 		if child == nil {
+			fmt.Fprintf(out, "%s%p%d [shape=\"point\"];\n", prefix, node, i)
+			fmt.Fprintf(out, "%s%p -> %s%p%d;\n", prefix, node, prefix, node, i)
 			continue
 		}
 		DrawPrefixed(out, child, prefix)

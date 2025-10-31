@@ -1,8 +1,9 @@
 package multitree
 
 import (
-	"log"
-	"math"
+	"errors"
+	"fmt"
+	"os"
 	"strconv"
 	"unicode"
 )
@@ -10,120 +11,74 @@ import (
 // FromString parses its input string, turning it into a multitree
 func FromString(str string) *Node {
 	runes := []rune(str)
-	root, _ := FromRunes(runes, 0, len(str))
+	consumed, root, err := FromRunes(runes)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "problem parsing %q: %v\n", str, err)
+		return nil
+	}
+	if consumed != len(runes) {
+		fmt.Fprintf(os.Stderr, "used %d of %d characters to construct tree\n",
+			consumed, len(runes))
+	}
 	return root
 }
 
 // FromRunes parses its input []rune, turning it into a mulitree,
 // filling in any child nodes described by the input []rune,
-// returning the multitree and the offset of runes just after the
-// parsed expression.
-func FromRunes(runes []rune, offset int, end int) (*Node, int) {
-	// Check that it has leading '(' and trailing '('
-	if runes[0] != '(' || runes[end-1] != ')' {
-		log.Printf("FromRunes(%q, %d, %d) not called with parens\n", string(runes), offset, end)
-	}
-	// remove leading '('
-	offset++
-
-	// read number's digits
-	makenode, number, newoffset := readDigits(runes, offset, end)
-
-	if !makenode {
-		return nil, newoffset + 1
+// returning the multitree and the count of runes consumed
+func FromRunes(runes []rune) (int, *Node, error) {
+	if runes[0] != '(' {
+		return 0, nil, errors.New("first character not opening parenthesis")
 	}
 
-	// create Node with number as Data
-	node := &Node{Data: number}
-
-	offset = newoffset
-
-	// Loop over remainder of runes to find child nodes
-	for offset < end-1 {
-		// 1. eat whitespace
-		offset = eatWhiteSpace(runes, offset, end)
-
-		// 2. Find next matching ')'
-		endoffset := findRightParen(runes, offset)
-
-		// 3. Call FromRunes with this slice of runes
-		childNode, xoffset := FromRunes(runes, offset, endoffset)
-
-		// 4. Add new child node to array of Children, even if nil
-		node.Children = append(node.Children, childNode)
-
-		// what's relationship between endoffset and xoffset?
-		offset = xoffset
-	}
-
-	// remove trailing ')'
-	offset++
-
-	return node, offset
-}
-
-// readDigits returns a number, converted from the leading digits
-// of runes []rune, and an index of where the number ends.
-func readDigits(runes []rune, offset int, end int) (bool, int, int) {
+	foundClosing := false
+	max := len(runes)
+	consumed := 1 // skip opening parentheses
+	var children []*Node
 	var valueRunes []rune
-	for {
-		if runes[offset] == '(' {
-			break
+
+loop:
+	for consumed < max {
+		switch runes[consumed] {
+		case '(':
+			c, n, e := FromRunes(runes[consumed:])
+			consumed += c
+			if e != nil {
+				return consumed, nil, e
+			}
+			children = append(children, n)
+		case ')':
+			consumed++
+			foundClosing = true
+			break loop
+		default:
+			if unicode.IsSpace(runes[consumed]) {
+				consumed++
+				continue
+			}
+			valueRunes = append(valueRunes, runes[consumed])
+			consumed++
 		}
-		if runes[offset] == ')' {
-			break
-		}
-		if offset == end {
-			break
-		}
-		if unicode.IsSpace(runes[offset]) {
-			break
-		}
-		valueRunes = append(valueRunes, runes[offset])
-		offset++
+	}
+
+	if !foundClosing {
+		return consumed, nil, errors.New("failed to find closing paren")
 	}
 
 	if len(valueRunes) == 0 {
-		return false, math.MinInt64, offset
+		// assume this is a nil node, even if len(children) > 0
+		return consumed, nil, nil
 	}
 
-	number, err := strconv.Atoi(string(valueRunes))
+	datum, err := strconv.Atoi(string(valueRunes))
 	if err != nil {
-		log.Print(err)
+		return consumed, nil, err
 	}
-	return true, number, offset
-}
 
-// findRightParen takes an array of runes, where '(' is at
-// index 0, and a matching ')' is at some greater index.
-// Returns that greater index
-func findRightParen(r []rune, offset int) int {
-	stack := make([]rune, 1)
-	stack[0] = r[offset]
-	end := offset
-
-	for idx := offset + 1; len(stack) > 0; idx++ {
-		switch r[idx] {
-		case '(':
-			stack = append(stack, '(')
-		case ')':
-			if stack[len(stack)-1] == '(' {
-				stack = stack[0 : len(stack)-1]
-			}
-		}
-		end++
+	newNode := &Node{
+		Data:     datum,
+		Children: children,
 	}
-	return end + 1
-}
 
-// eatWhiteSpace starts at index offset in runes,
-// and returns the index of the next non-whitespace rune.
-func eatWhiteSpace(runes []rune, offset int, end int) int {
-	for unicode.IsSpace(runes[offset]) {
-		offset++
-		if offset == end {
-			break
-		}
-	}
-	return offset
+	return consumed, newNode, nil
 }

@@ -123,12 +123,13 @@ func dfuds(out io.Writer, node *Node) {
 func ParseDFUDS(stringrep string) (*Node, error) {
 	runes := []rune(stringrep)
 
+	// start at runes[1], there's an extra '(' at the beginning
 	consumed, root, err := realParseDFUDS(runes[1:])
 	if err != nil {
 		return nil, err
 	}
 
-	if consumed != len(runes) {
+	if consumed != len(runes)-1 {
 		return root, fmt.Errorf("consumed %d of %d characters\n", consumed, len(runes))
 	}
 
@@ -150,7 +151,7 @@ func realParseDFUDS(runes []rune) (int, *Node, error) {
 		valueRunes = append(valueRunes, runes[consumed])
 		consumed++
 	}
-	consumed++
+	consumed++ // eat the ')'
 
 	n, err := strconv.Atoi(strings.TrimSpace(string(valueRunes)))
 	if err != nil {
@@ -162,14 +163,13 @@ func realParseDFUDS(runes []rune) (int, *Node, error) {
 		Children: make([]*Node, childCount, childCount),
 	}
 
-	for i := 0; i < childCount; {
+	for i := 0; i < childCount; i++ {
 		c, n, e := realParseDFUDS(runes[consumed:])
 		if e != nil {
 			return consumed + c, nil, e
 		}
 		newnode.Children[i] = n
 		consumed += c
-		i++
 	}
 
 	return consumed, newnode, nil

@@ -276,6 +276,48 @@ $ dot -Tpng -o x.png
 
 ---
 
+### Depth-first Unary Degree Sequence String Representation
+
+
+In [Representing Trees of Higher Degree](https://www.researchgate.net/publication/226863715_Representing_Trees_of_Higher_Degree)
+Benoit et al demonstrate a different parentheses based string representation,
+"Depth-first Unary Degree Sequence".
+The parentheses are still balanced, but are arranged differently.
+
+For the example tree of coding problem #237,
+
+```
+        4
+      / | \
+    3   5   3
+  /           \
+ 9             9
+```
+
+The usual, "Balanced Parentheses" string representation is `(4 (3 (9)) (5) (3 (9)))`
+
+The DFUDS representation is `((((4)(3)9)5)(3)9)`
+
+The representation has one open paren ('(') for each child node,
+the node value, and a closing paren (')').
+Child nodes, represented the same way, follow.
+There's an extra initial '(' to balance all the ')' in the string representation.
+This representation is accomplished by outputting the initial, extra '(',
+then performing a pre-order depth first traverse.
+At each node, output one '(' for each child, the node's data value,
+and a ')'. Then recurse on child nodes in order.
+
+I wrote [readtree](readtree.go) to convert from one format to the other.
+
+```
+$ go build readtree.go
+$ ./readtree -D '(0 (1) (2 (3) (4)) (1))'
+((((0)1)((2)3)4)1)
+$ ./readtree -d '((((0)1)((2)3)4)1)'
+(0 (1) (2 (3) (4)) (1))
+```
+---
+
 ### Daily Coding Problem: Problem #686 [Hard]
 
 This problem was asked by Adobe.

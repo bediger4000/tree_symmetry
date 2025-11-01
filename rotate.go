@@ -2,12 +2,16 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"tree_symmetry/multitree"
 )
 
 func main() {
-	root := multitree.FromString(os.Args[1])
+	root, err := multitree.FromString(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Printf("digraph g1 {\n")
 	fmt.Printf("subgraph cluster_0 {\n\tlabel=\"before\"\n")

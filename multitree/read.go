@@ -3,24 +3,25 @@ package multitree
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
+	"strings"
 	"unicode"
 )
 
 // FromString parses its input string, turning it into a multitree
-func FromString(str string) *Node {
+func FromString(str string) (*Node, error) {
 	runes := []rune(str)
 	consumed, root, err := FromRunes(runes)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "problem parsing %q: %v\n", str, err)
-		return nil
+		return nil, err
 	}
 	if consumed != len(runes) {
-		fmt.Fprintf(os.Stderr, "used %d of %d characters to construct tree\n",
+		err = fmt.Errorf("used %d of %d characters to construct tree\n",
 			consumed, len(runes))
 	}
-	return root
+	return root, err
 }
 
 // FromRunes parses its input []rune, turning it into a mulitree,
@@ -81,4 +82,95 @@ loop:
 	}
 
 	return consumed, newNode, nil
+}
+
+var leftParen = []byte{'('}
+var rightParen = []byte{')'}
+
+// PrintDFUDS write a Depth-first Unary Degree Sequence
+// representation of a multitree on stdout
+func PrintDFUDS(root *Node) {
+	PrintfDFUDS(os.Stdout, root)
+}
+
+// PrintfDFUDS write a Depth-first Unary Degree Sequence
+// representation of a multitree on an arbitrary io.Writer
+// No newline. Provide your own.
+func PrintfDFUDS(out io.Writer, root *Node) {
+	out.Write(leftParen)
+	dfuds(out, root)
+}
+
+func dfuds(out io.Writer, node *Node) {
+	if node == nil {
+		return
+	}
+
+	l := len(node.Children)
+
+	for i := 0; i < l; i++ {
+		out.Write(leftParen)
+	}
+	out.Write([]byte(strconv.Itoa(node.Data)))
+	out.Write(rightParen)
+	for _, child := range node.Children {
+		dfuds(out, child)
+	}
+}
+
+// ParseDFUDS parse Depth-first Unary Degree Sequence format
+// string representations of multitrees.
+func ParseDFUDS(stringrep string) (*Node, error) {
+	runes := []rune(stringrep)
+
+	consumed, root, err := realParseDFUDS(runes[1:])
+	if err != nil {
+		return nil, err
+	}
+
+	if consumed != len(runes) {
+		return root, fmt.Errorf("consumed %d of %d characters\n", consumed, len(runes))
+	}
+
+	return root, nil
+}
+
+func realParseDFUDS(runes []rune) (int, *Node, error) {
+	childCount := 0
+	consumed := 0
+
+	for runes[consumed] == '(' {
+		consumed++
+		childCount++
+	}
+
+	var valueRunes []rune
+
+	for runes[consumed] != ')' {
+		valueRunes = append(valueRunes, runes[consumed])
+		consumed++
+	}
+	consumed++
+
+	n, err := strconv.Atoi(strings.TrimSpace(string(valueRunes)))
+	if err != nil {
+		return consumed, nil, err
+	}
+
+	newnode := &Node{
+		Data:     n,
+		Children: make([]*Node, childCount, childCount),
+	}
+
+	for i := 0; i < childCount; {
+		c, n, e := realParseDFUDS(runes[consumed:])
+		if e != nil {
+			return consumed + c, nil, e
+		}
+		newnode.Children[i] = n
+		consumed += c
+		i++
+	}
+
+	return consumed, newnode, nil
 }

@@ -30,7 +30,10 @@ func main() {
 		return
 	}
 
-	multitreeRoot := multitree.FromString(os.Args[1])
+	multitreeRoot, err := multitree.FromString(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Printf("digraph g1 {\n")
 	fmt.Printf("subgraph cluster_0 {\n\tlabel=\"multitree\"\n")
 	multitree.DrawPrefixed(os.Stdout, multitreeRoot, "a")

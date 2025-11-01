@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"tree_symmetry/multitree"
 )
@@ -15,7 +16,10 @@ func main() {
 		n = 2
 		viaExitStatus = true
 	}
-	root := multitree.FromString(os.Args[n])
+	root, err := multitree.FromString(os.Args[n])
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	if viaExitStatus {
 		if symmetric(root) {

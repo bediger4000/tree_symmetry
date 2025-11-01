@@ -4,12 +4,17 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"tree_symmetry/multitree"
 )
 
 func main() {
-	root := multitree.FromString(os.Args[1])
+	root, err := multitree.FromString(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	multitree.PreorderVisitorTraverse(root, multitree.PrintVisitor)
 	fmt.Println()
 }

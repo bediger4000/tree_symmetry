@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"tree_symmetry/multitree"
 	"tree_symmetry/tree"
@@ -11,29 +12,31 @@ import (
 
 func main() {
 	if os.Args[1] == "-r" {
-		root := multitree.FromString(os.Args[2])
-		binaryTree := knuthTransform(root)
-		copyTree := knuthUnTransform(binaryTree)
+		binaryTree, err := tree.CreateNumericFromString(os.Args[2])
+		if err != nil {
+			log.Fatal(err)
+		}
+		root := knuthUnTransform(binaryTree)
 
 		fmt.Printf("digraph g1 {\n")
-		fmt.Printf("subgraph cluster_0 {\n\tlabel=\"original\"\n")
-		multitree.DrawPrefixed(os.Stdout, root, "original")
+		fmt.Printf("subgraph cluster_0 {\n\tlabel=\"binary tree\"\n")
+		tree.DrawPrefixed(os.Stdout, binaryTree, "b")
 		fmt.Printf("\n}\n")
-		fmt.Printf("subgraph cluster_1 {\n\tlabel=\"copy\"\n")
-		multitree.DrawPrefixed(os.Stdout, copyTree, "copy")
+		fmt.Printf("subgraph cluster_1 {\n\tlabel=\"transformed\"\n")
+		multitree.DrawPrefixed(os.Stdout, root, "original")
 		fmt.Printf("\n}\n")
 		fmt.Printf("\n}\n")
 
 		return
 	}
 
-	root := multitree.FromString(os.Args[1])
+	multitreeRoot := multitree.FromString(os.Args[1])
 	fmt.Printf("digraph g1 {\n")
 	fmt.Printf("subgraph cluster_0 {\n\tlabel=\"multitree\"\n")
-	multitree.DrawPrefixed(os.Stdout, root, "a")
+	multitree.DrawPrefixed(os.Stdout, multitreeRoot, "a")
 	fmt.Printf("\n}\n")
-	binaryTree := knuthTransform(root)
-	fmt.Printf("subgraph cluster_1 {\n\tlabel=\"binary tree\"\n")
+	binaryTree := knuthTransform(multitreeRoot)
+	fmt.Printf("subgraph cluster_1 {\n\tlabel=\"transformed\"\n")
 	tree.DrawPrefixed(os.Stdout, binaryTree, "b")
 	fmt.Printf("\n}\n")
 	fmt.Printf("\n}\n")

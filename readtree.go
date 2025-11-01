@@ -32,6 +32,7 @@ func main() {
 
 	if *dfudsout {
 		multitree.PrintDFUDS(root)
+		fmt.Println()
 		return
 	}
 

@@ -21,7 +21,7 @@ but one or more of the child nodes can be nil/null/unset.
 
 And then there are the coding problems trees.
 
-## Daily Coding Problem: Problem #237
+### Daily Coding Problem: Problem #237
 
 
 A tree is symmetric if its data and shape remain unchanged when it is
@@ -47,7 +47,7 @@ This is kind of an ordinal tree,
 in that nodes don't necessarily have the same number of children,
 but also like a cardinal tree, in that some child nodes can be unset.
 
-## package multitree
+#### package multitree
 
 I wrote a small Golang package to represent trees where nodes
 have any number of children, and some children can be unset.
@@ -69,7 +69,7 @@ The text representation is a "balanced parentheses", lisp-like representation.
 The example tree from the problem statement above can be represented as
 `(4 (3 (9)) (5) (3 (9)))` or `(4 (3 (9) ()) (5) (3 () (9)))`
 
-## Algorithms
+#### Algorithms
 
 First, two nodes are partially identical if they are both non-nil,
 have numerically equal data values,
@@ -79,7 +79,7 @@ and corresponding child nodes being fully equal.
 
 I wrote two algorithms to do this.
 
-### Recursive
+#### Recursive
 
 [Recursive program](sym.go)
 
@@ -120,7 +120,7 @@ Benoit et al's ordinal trees wouldn't have that criteria.
 
 The function only has to check half the child nodes against the other half.
 
-### Iterative
+#### Iterative
 
 [Iterative program](sim_iterative.go)
 
@@ -177,35 +177,40 @@ if the 5-valued node had child nodes, they would need to be checked, too.
 The pair of 3-valued nodes get popped off the explicit stack,
 the two 9-valued nodes get pushed, etc etc.
 
-## Analysis
+### Analysis
 
 A web search turns up a lot of "are binary trees symmetric" solutions,
 but very few multi-child tree solutions.
 
-If you assume that an ordering of child nodes exists,
-and that unset child nodes are significant,
-you end up having to deal with cases like this:
 
-```
-tree 1: (4 (3 () (6)) (5) (3 (6) ()))
-tree 2: (4 (3 () (6)) (5) (3 (6)   ))
-```
-
-I think tree 1 is not symmetric, although my software says it is
-
-Is tree 2 symmetric? 
-The 3-valued nodes have different length child-node-arrays,
-but the left-hand 3-valued node has a nil-valued node just
-to keep the order correct.
-
-There are a few tricky parts.
+Beyond needing to check "middle" child nodes against themselves,
+there are a few tricky parts.
 The first is that instead of a recursive comparison having to
 "go left" for one child, and "go right" for the other child,
 the code has to compare "mirror" nodes.
 For a node with 4 children, that's comparing child 1 and child 4,
-and child 2 and 3.
 
-This is probably a decent interview problem.
+If you assume that unset child nodes are significant,
+you end up having to deal with cases like this:
+
+```
+tree 1: (4 (3 () (6)) (5) (3 (6) ()))
+tree 2: (4 (3 (5) ()) (5) (3 (5)   ))
+```
+
+My software says neither tree is symmetric.
+Is tree 2 symmetric? 
+The two 3-valued nodes have different length child-node-arrays.
+The left-hand 3-valued node has a nil-valued node as its third child.
+
+I believe this is why Benoit et al make a distinction between "ordinal trees",
+with no unset/nil/null child nodes,
+and "cardinal trees" with a fixed number of child nodes.
+
+### Interview Analysis
+
+Despite potential confusion about allowing nil/null/unset child nodes,
+this is a decent interview problem.
 Multi-child trees don't occur too often in day-to-day programming,
 so candidates probably haven't worked with them before.
 I know I had to build some infrastructure
@@ -215,7 +220,8 @@ My binary tree infrastructure was not suitable.
 
 The interviewer would get to see if a candidate could ask good questions
 since ordering of child nodes is potentially a sticky issue.
-The interviewer could see if a candidate can do array indexing and recursive problem solving.
+The interviewer could see if a candidate can do array indexing
+and recursive problem solving.
 
 When careless mirror child node selection can lead to examining the tree twice,
 and the idea that both comparison nodes can refer to the same node exist,
@@ -251,23 +257,26 @@ This is the example tree shown in the Wikipedia article:
 
 ```
 $ ./transform '(1 (2 (5) (6)) (3) (4 (7 (8)(9))))' > x.dot
-$ dot -Tpng -o x.png
+$ dot -Tpng -o x.png x.dot
 ```
 
 That will get you a PNG graphic showing a multitree and the equivalent binary
 tree after a Knuth Transform.
 
+![example knuth transform](knuth_transform.png)
+
 The reverse is just as easy: the special format binary trees produced by a Knuth Transform
 can be returned to a k-ary tree.
 
 ```
-$ ./transform -r '(1 (2 (5) (6)) (3) (4 (7 (8)(9))))' > x.dot
+$ ./transform -r '(1 (2 (5 () (6)) (3 () (4 (7 (8 () (9)))))))' > x.dot
 $ dot -Tpng -o x.png
 ```
+![example knuth reverse transform](knuth_untransform.png)
 
 ---
 
-## Daily Coding Problem: Problem #686 [Hard]
+### Daily Coding Problem: Problem #686 [Hard]
 
 This problem was asked by Adobe.
 

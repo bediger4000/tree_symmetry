@@ -18,7 +18,7 @@ func FromString(str string) (*Node, error) {
 		return nil, err
 	}
 	if consumed != len(runes) {
-		err = fmt.Errorf("used %d of %d characters to construct tree\n",
+		err = fmt.Errorf("used %d of %d characters to construct tree",
 			consumed, len(runes))
 	}
 	return root, err
@@ -101,6 +101,8 @@ func PrintfDFUDS(out io.Writer, root *Node) {
 	dfuds(out, root)
 }
 
+// dfuds puts a DFUDS multitree representation on out
+// by a pre-order traverse.
 func dfuds(out io.Writer, node *Node) {
 	if node == nil {
 		return
@@ -130,7 +132,7 @@ func ParseDFUDS(stringrep string) (*Node, error) {
 	}
 
 	if consumed != len(runes)-1 {
-		return root, fmt.Errorf("consumed %d of %d characters\n", consumed, len(runes))
+		return root, fmt.Errorf("consumed %d of %d characters", consumed, len(runes))
 	}
 
 	return root, nil
